@@ -2,8 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 
 headers = {
-    "User-Agent": 
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
+    "User-Agent": # "your user agent"
+
+    
 }
 
 product = input("Qual o nome do produto? ") 
@@ -33,15 +34,57 @@ while True:
     cents = soup.find_all('span', class_='andes-money-amount__cents')
 
     links = soup.find_all('a', class_='ui-search-item__group__element ui-search-link__title-card ui-search-link')
-
-    if not titles:
-        print("Não há mais itens")
-        break
     
     for title, price, cent, link in zip(titles, prices, cents, links):
         print(f'\033[mProduto: {title.get_text()}')
         print(f'\033[32mPreço: R${price.get_text()},{cent.get_text()}')
         print(f'\033[34mLink: {link.get("href")}\n')
+
+    if not request:
+        print("Não há mais itens")
+        break
     
     page += 50
 
+
+
+    # response = requests.get(url)
+    # if response.status_code != 200:
+    #     print(f"Erro ao acessar a URL: {response.status_code}")
+    #     return
+
+    # soup = BeautifulSoup(response.text, 'html.parser')
+    # ol_container = soup.find('ol', class_='ui-search-layout ui-search-layout--stack shops__layout')
+    # items = ol_container.find_all('li', class_='ui-search-layout__item')
+    
+    # results = []
+    # for item in items:
+
+    #     price_container = item.find('span', class_='andes-money-amount andes-money-amount--cents-superscript')
+    #     price = None
+    #     if price_container:
+    #         real = price_container.find('span', class_='andes-money-amount__fraction')
+    #         cents = price_container.find('span', class_='andes-money-amount__cents')
+    #         if real:
+    #             price = f"R${real.text},{cents.text.zfill(2) if cents else '00'}"
+
+
+    #     title = item.find('h2', class_='poly-box poly-component__title')
+    #     title_text = title.text if title else None
+
+    #     link = item.find('a', href=True)
+    #     link_url = link['href'] if link else None
+
+    #     rating = item.find('span', class_='poly-reviews__rating', attrs={'aria-hidden': 'true'})
+    #     rating_value = rating.text if rating else 'não avaliado'
+
+    #     results.append({
+    #         'price': price,
+    #         'title': title_text,
+    #         'link': link_url,
+    #         'rating_value': rating_value
+    #     })
+
+    
+    # for result in results:
+            
