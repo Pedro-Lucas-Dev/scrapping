@@ -2,9 +2,13 @@ import requests
 from bs4 import BeautifulSoup
 
 headers = {
+<<<<<<< HEAD
     "User-Agent": # "your user agent"
 
     
+=======
+    "User-Agent": # "YOUR USER AGENT"
+>>>>>>> 3330a62f822e91af732ca0a0b1036a6e6413ea42
 }
 
 product = input("Qual o nome do produto? ") 
