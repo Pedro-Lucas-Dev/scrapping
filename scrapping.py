@@ -25,10 +25,15 @@ def main(produto, cidade):
 
    
     filename = 'consulta_produto.csv'
+    filename_links = 'links_produto.csv'
    
-    with open(filename, 'w', newline='', encoding='utf-8') as f:
+    with open(filename, 'w', newline='', encoding='utf-8') as f, \
+         open(filename_links, 'w', newline='', encoding='utf-8') as f_links:
+
         writer = csv.writer(f)
-        writer.writerow(['Descrição', 'Preço', 'Link', 'Avaliações'])   
+        writer_links = csv.writer(f_links)
+
+        writer.writerow(['Descrição', 'Preço', 'Link', 'Avaliações']) 
         
         page = 1
         
@@ -55,6 +60,9 @@ def main(produto, cidade):
                 reviews_text = reviews.text if reviews else "Avaliações não encontradas"
                 
                 writer.writerow([description_text, price_text, link_text, reviews_text])
+
+                if link:
+                    writer_links.writerow([link_text])
            
             page += 50
 
