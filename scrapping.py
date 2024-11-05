@@ -22,26 +22,25 @@ def main(produto, cidade):
         url = f'https://lista.mercadolivre.com.br/{cit}/{product}_Frete_Full'
     else:
         url = f'https://lista.mercadolivre.com.br/{product}_Frete_Full'
-    page = 1
+
+   
     filename = 'consulta_produto.csv'
    
     with open(filename, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         writer.writerow(['Descrição', 'Preço', 'Link', 'Avaliações'])   
         
+        page = 1
+        
         while True:
             final_url = f'{url}_Desde_{page}_NoIndex_True'
             response = requests.get(final_url, headers=headers)
-           
-            if response.status_code != 200:
-                messagebox.showinfo("Páginas Acabaram", "As paginas acabaram! não há mais resultados")
-                break
 
             soup = BeautifulSoup(response.text, 'html.parser')
             items = soup.find_all('div', class_='poly-card__content')
-           
-            if not items:
-                messagebox.showinfo("Concluído", "Scraping concluído!")
+
+            if response.status_code != 200:
+                messagebox.showinfo("Páginas Acabaram", "As paginas acabaram! não há mais resultados")
                 break
            
             for item in items:
@@ -62,7 +61,7 @@ def main(produto, cidade):
 def create_scrapping():
     
     root = tk.Tk()
-    root.title("Scraping Mercado Livre")
+    root.title(" ")
     root.geometry("400x300")
     root.resizable(False, False)
     
@@ -79,7 +78,7 @@ def create_scrapping():
     cidade_entry = tk.Entry(root, width=40)
     cidade_entry.pack(pady=(0, 10))
    
-    iniciar_button = tk.Button(root, text="Iniciar Consulta", font=("Arial", 12), bg="green", fg="white",
+    iniciar_button = tk.Button(root, text="Iniciar Consulta", font=("Arial", 12), bg="green", fg="black",
                                command=lambda: main(produto_entry.get(), cidade_entry.get()))
     iniciar_button.pack(pady=20)
     
