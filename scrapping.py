@@ -1,94 +1,88 @@
 import requests
 from bs4 import BeautifulSoup
+import tkinter as tk
+from tkinter import messagebox
+import csv
 
+# Configuração do cabeçalho para simular um navegador
 headers = {
-<<<<<<< HEAD
-    "User-Agent": # "your user agent"
-
-    
-=======
-    "User-Agent": # "YOUR USER AGENT"
->>>>>>> 3330a62f822e91af732ca0a0b1036a6e6413ea42
+    'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.6562.74 Safari/537.36'
 }
 
-product = input("Qual o nome do produto? ") 
-product = product.replace(" " , "-")
-
-cit = input("Qual a Cidade? ")
-cit = cit.replace(" " , "-")
-
-if cit:
-    url = f'https://lista.mercadolivre.com.br/{cit}/{product}_Frete_Full'
-else:
-    url = f'https://lista.mercadolivre.com.br/{product}_Frete_Full'
-
-page = 1
-
-while True: 
-
-    final_url = f'{url}_Desde_{page}_NoIndex_True'
-
-    request = requests.get(final_url, headers=headers)
-
-    soup = BeautifulSoup(request.content, 'html.parser')
-
-    titles = soup.find_all('h2', class_='ui-search-item__title')
-
-    prices = soup.find_all('span', class_='andes-money-amount__fraction')
-    cents = soup.find_all('span', class_='andes-money-amount__cents')
-
-    links = soup.find_all('a', class_='ui-search-item__group__element ui-search-link__title-card ui-search-link')
+def main(produto, cidade):
+    if not produto:
+        messagebox.showerror("Erro", "Por favor, insira o nome do produto.")
+        return
     
-    for title, price, cent, link in zip(titles, prices, cents, links):
-        print(f'\033[mProduto: {title.get_text()}')
-        print(f'\033[32mPreço: R${price.get_text()},{cent.get_text()}')
-        print(f'\033[34mLink: {link.get("href")}\n')
-
-    if not request:
-        print("Não há mais itens")
-        break
+    product = produto.replace(" ", "-")
+    cit = cidade.replace(" ", "-") if cidade else ""
     
-    page += 50
+    if cit:
+        url = f'https://lista.mercadolivre.com.br/{cit}/{product}_Frete_Full'
+    else:
+        url = f'https://lista.mercadolivre.com.br/{product}_Frete_Full'
+    page = 1
+    filename = 'consulta_produto.csv'
+   
+    with open(filename, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['Descrição', 'Preço', 'Link', 'Avaliações'])   
+        
+        while True:
+            final_url = f'{url}_Desde_{page}_NoIndex_True'
+            response = requests.get(final_url, headers=headers)
+           
+            if response.status_code != 200:
+                messagebox.showinfo("Páginas Acabaram", "As paginas acabaram! não há mais resultados")
+                break
 
+            soup = BeautifulSoup(response.text, 'html.parser')
+            items = soup.find_all('div', class_='poly-card__content')
+           
+            if not items:
+                messagebox.showinfo("Concluído", "Scraping concluído!")
+                break
+           
+            for item in items:
+                description = item.find('h2', class_='poly-box poly-component__title')
+                price = item.find('span', class_='andes-money-amount andes-money-amount--cents-superscript')
+                link = item.find('a')['href'] if item.find('a') else None
+                reviews = item.find('span', class_='poly-reviews__rating')
+                
+                description_text = description.text if description else "Descrição não encontrada"
+                price_text = price.text if price else "Preço não encontrado"
+                link_text = link if link else "Link não encontrado"
+                reviews_text = reviews.text if reviews else "Avaliações não encontradas"
+                
+                writer.writerow([description_text, price_text, link_text, reviews_text])
+           
+            page += 50
 
-
-    # response = requests.get(url)
-    # if response.status_code != 200:
-    #     print(f"Erro ao acessar a URL: {response.status_code}")
-    #     return
-
-    # soup = BeautifulSoup(response.text, 'html.parser')
-    # ol_container = soup.find('ol', class_='ui-search-layout ui-search-layout--stack shops__layout')
-    # items = ol_container.find_all('li', class_='ui-search-layout__item')
+def create_scrapping():
     
-    # results = []
-    # for item in items:
-
-    #     price_container = item.find('span', class_='andes-money-amount andes-money-amount--cents-superscript')
-    #     price = None
-    #     if price_container:
-    #         real = price_container.find('span', class_='andes-money-amount__fraction')
-    #         cents = price_container.find('span', class_='andes-money-amount__cents')
-    #         if real:
-    #             price = f"R${real.text},{cents.text.zfill(2) if cents else '00'}"
-
-
-    #     title = item.find('h2', class_='poly-box poly-component__title')
-    #     title_text = title.text if title else None
-
-    #     link = item.find('a', href=True)
-    #     link_url = link['href'] if link else None
-
-    #     rating = item.find('span', class_='poly-reviews__rating', attrs={'aria-hidden': 'true'})
-    #     rating_value = rating.text if rating else 'não avaliado'
-
-    #     results.append({
-    #         'price': price,
-    #         'title': title_text,
-    #         'link': link_url,
-    #         'rating_value': rating_value
-    #     })
-
+    root = tk.Tk()
+    root.title("Scraping Mercado Livre")
+    root.geometry("400x300")
+    root.resizable(False, False)
     
-    # for result in results:
-            
+    titulo = tk.Label(root, text="Consulta de Produtos no Mercado Livre", font=("Arial", 14, "bold"))
+    titulo.pack(pady=10)
+    
+    produto_label = tk.Label(root, text="Nome do Produto:", font=("Arial", 10))
+    produto_label.pack(pady=(10, 0))
+    produto_entry = tk.Entry(root, width=40)
+    produto_entry.pack(pady=(0, 10))
+    
+    cidade_label = tk.Label(root, text="Cidade (Opcional):", font=("Arial", 10))
+    cidade_label.pack(pady=(10, 0))
+    cidade_entry = tk.Entry(root, width=40)
+    cidade_entry.pack(pady=(0, 10))
+   
+    iniciar_button = tk.Button(root, text="Iniciar Consulta", font=("Arial", 12), bg="green", fg="white",
+                               command=lambda: main(produto_entry.get(), cidade_entry.get()))
+    iniciar_button.pack(pady=20)
+    
+    root.mainloop()
+if __name__ == "__main__":
+    create_scrapping()
