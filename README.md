@@ -1,6 +1,6 @@
 # Aplicação de Scraping Simples em Python
 
-Este projeto é uma aplicação simples de scraping desenvolvida em Python que utiliza as bibliotecas `requests` e `BeautifulSoup` para extrair dados de páginas web.
+Este projeto é uma aplicação simples de scraping desenvolvida em Python que utiliza as bibliotecas `requests` e `BeautifulSoup` para extrair dados de páginas web e retornar um arquivo csv.
 
 ## Pré-requisitos
 
